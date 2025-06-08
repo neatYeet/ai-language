@@ -28,7 +28,6 @@ const Home: NextPage = () => {
         fetchQuestions,
         handleAnswerChange,
         handleSubmit,
-        toRomaji,
     } = useQuizLogic();
 
     return (
@@ -111,10 +110,10 @@ const Home: NextPage = () => {
                                                 onClick={() => fetchQuestions(lvl)}
                                                 disabled={loading || isLevelLocked}
                                                 className={`relative group p-6 rounded-2xl font-bold transition-all duration-300 transform ${isActive
-                                                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-2xl scale-110 -translate-y-2'
-                                                        : isLevelLocked
-                                                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                            : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:shadow-xl hover:scale-105 hover:-translate-y-1'
+                                                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-2xl scale-110 -translate-y-2'
+                                                    : isLevelLocked
+                                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                        : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:shadow-xl hover:scale-105 hover:-translate-y-1'
                                                     } ${loading ? 'opacity-50 cursor-not-allowed' : ''} shadow-lg border border-white/20`}
                                             >
                                                 <div className="text-2xl mb-2">
@@ -201,7 +200,7 @@ const Home: NextPage = () => {
                                                             iconClass = '👆';
                                                         }
 
-                                                        const displayedOption = answerDisplayFormat === 'romaji' ? toRomaji(option) : option;
+                                                        const displayedOption = answerDisplayFormat === 'romaji' && questionLanguage === 'english' && q.options_romaji ? q.options_romaji[i] : option;
                                                         return (
                                                             <button
                                                                 key={i}
@@ -222,7 +221,7 @@ const Home: NextPage = () => {
                                                     <summary className="cursor-pointer text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors duration-300 flex items-center space-x-2 p-3 rounded-xl hover:bg-yellow-50">
                                                         <span>💡</span>
                                                         <span>Need a hint?</span>
-                                                        <span className="transform transition-transform duration-300 group-open/hint:rotate-180">⏷</span>
+                                                        <span className="transform transition-transform duration-300 group-open/hint:rotate-180">🔻</span>
                                                     </summary>
                                                     <div className="mt-3 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 border-l-4 border-yellow-400 text-yellow-900 rounded-2xl shadow-inner">
                                                         <p className="font-medium">{q.hint}</p>

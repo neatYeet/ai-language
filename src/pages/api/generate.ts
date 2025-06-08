@@ -7,6 +7,7 @@ interface Question {
     answer: string;
     hint: string;
     question_romaji: string;
+    options_romaji?: string[];
 }
 
 interface RequestBody {
@@ -62,12 +63,15 @@ export default async function handler(
 
   The JSON object must have one key: "questions".
   The value of "questions" must be an array of 5 objects.
-  Each object in the array MUST contain these five keys:
+  Each object in the array MUST contain these six keys:
   1. "question": A string in English (e.g., "What is 'apple' in Japanese?").
   2. "options": An array of 4 strings (Japanese words or phrases).
   3. "answer": A string that is an exact match to one of the "options".
   4. "hint": A string containing a helpful hint in English or simple hiragana.
   5. "question_romaji": A string containing the Romaji transliteration of the correct answer.
+     **Crucially, this Romaji should be generated directly by you based on the Japanese answer provided.**
+  6. "options_romaji": An array of 4 strings containing the Romaji transliteration for each corresponding option in the "options" array.
+     **Crucially, these Romaji transliterations should be generated directly by you based on the Japanese options provided.**
 `;
         } else {
             prompt = `
@@ -88,6 +92,7 @@ export default async function handler(
   5. "question_romaji": A string containing the literal Romaji transliteration of the "question" field.
      **Crucially, do NOT fill in the blank.** The "_______" characters must remain as "_______".
      **Example:** If the question is "🍎 これは_______です。", the question_romaji MUST be "🍎 kore wa _______ desu.".
+     **Crucially, this Romaji should be generated directly by you based on the Japanese question provided.**
 `;
         }
 
