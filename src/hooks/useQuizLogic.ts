@@ -176,9 +176,9 @@ const useQuizLogic = (): UseQuizLogic => {
 
         let romaji = '';
         for (let i = 0; i < text.length; i++) {
-            let char = text[i];
-            let nextChar = text[i + 1];
-            let twoChars = char + nextChar;
+            const char = text[i];
+            const nextChar = text[i + 1];
+            const twoChars = char + nextChar;
 
             if (hiraganaMap[twoChars]) {
                 romaji += hiraganaMap[twoChars];
@@ -186,7 +186,7 @@ const useQuizLogic = (): UseQuizLogic => {
             } else if (hiraganaMap[char]) {
                 romaji += hiraganaMap[char];
             } else {
-                romaji += char; // Keep non-hiragana characters as they are
+                romaji += char;
             }
         }
         return romaji;
