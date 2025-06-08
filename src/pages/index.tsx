@@ -52,7 +52,7 @@ const Home: NextPage = () => {
                     behavior: 'smooth',
                     block: 'start'
                 });
-            }, 500); // Delay to allow questions to render
+            }, 500);
         }
     }, [loading, questions.length]);
 
@@ -60,8 +60,20 @@ const Home: NextPage = () => {
         <>
             <Head>
                 <title>AI Japanese Learning</title>
-                <meta name="description" content="Learn Japanese with AI-generated questions" />
+                <meta name="description" content="Master Japanese with intelligent AI questions and interactive quizzes. Improve your vocabulary, grammar, and comprehension with personalized learning." />
                 <link rel="icon" href="/favicon.ico" />
+
+                {/* Open Graph / Facebook */}
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://ai-language-learning-eta.vercel.app/" />
+                <meta property="og:title" content="AI Japanese Learning - Master Japanese with AI Quizzes" />
+                <meta property="og:description" content="Improve your Japanese skills with AI-generated questions tailored to your level. Interactive quizzes for vocabulary, grammar, and comprehension." />
+
+                {/* Twitter */}
+                <meta property="twitter:card" content="summary_large_image" />
+                <meta property="twitter:url" content="https://ai-language-learning-eta.vercel.app/" />
+                <meta property="twitter:title" content="AI Japanese Learning - Master Japanese with AI Quizzes" />
+                <meta property="twitter:description" content="Improve your Japanese skills with AI-generated questions tailored to your level. Interactive quizzes for vocabulary, grammar, and comprehension." />
             </Head>
 
             <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative overflow-hidden">
