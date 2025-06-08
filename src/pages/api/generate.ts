@@ -5,6 +5,8 @@ interface Question {
     question: string;
     options: string[];
     answer: string;
+    hint: string;
+    question_romaji: string;
 }
 
 interface RequestBody {
@@ -47,22 +49,44 @@ export default async function handler(
         };
 
         const prompt = `
-      Create 5 multiple-choice questions for a Japanese language learner at the ${japaneseLevels[level]} level.
-      The questions should test vocabulary and grammar.
-      Provide the response as a valid JSON object with a single key "questions" which is an array of objects.
-      Each object in the array must have these keys: "question" (string), "options" (an array of 4 strings), and "answer" (a string).
-      Do not wrap the JSON in markdown backticks.
-    `;
+  You are an API that returns JSON. Do not speak in conversational language.
+  Your entire response must be ONLY the raw JSON object.
+  Do not use any markdown formatting (like \`\`\`json).
+  Your response must start immediately with "{" and end with "}".
+
+  Generate 5 multiple-choice questions for a Japanese language learner at the ${japaneseLevels[level]} level.
+
+  The JSON object must have one key: "questions".
+  The value of "questions" must be an array of 5 objects.
+  Each object in the array MUST contain these five keys:
+  1. "question": A string. For questions about objects, it MUST include an emoji for context (e.g., "🍎 これは_______です。").
+  2. "options": An array of 4 strings.
+  3. "answer": A string that is an exact match to one of the "options".
+  4. "hint": A string containing a helpful hint in English or simple hiragana.
+  5. "question_romaji": A string containing the correct Romaji transliteration of the entire "question" text.
+`;
+
 
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
 
-        const jsonResponse: { questions: Question[] } = JSON.parse(responseText);
+        const startIndex = responseText.indexOf('{');
+        const endIndex = responseText.lastIndexOf('}');
+
+        if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
+            console.error("Invalid response format, no JSON object found:", responseText);
+            throw new Error("Failed to find a valid JSON object in the response.");
+        }
+
+        const jsonString = responseText.substring(startIndex, endIndex + 1);
+
+        const jsonResponse: { questions: Question[] } = JSON.parse(jsonString);
+
 
         res.status(200).json(jsonResponse);
 
     } catch (error) {
         console.error('API call failed:', error);
-        res.status(500).json({ error: 'Failed to generate questions. The API may have returned an invalid format.' });
+        res.status(500).json({ error: 'The AI failed to return questions in a valid format. Please try again.' });
     }
 }

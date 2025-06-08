@@ -7,6 +7,8 @@ interface Question {
     question: string;
     options: string[];
     answer: string;
+    hint: string;
+    question_romaji: string;
 }
 
 interface UserAnswers {
@@ -23,6 +25,7 @@ const Home: NextPage = () => {
     const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
     const [score, setScore] = useState<number | null>(null);
     const [submitted, setSubmitted] = useState<boolean>(false);
+    const [visibleRomajiIndex, setVisibleRomajiIndex] = useState<number | null>(null);
 
     useEffect(() => {
         const storedApiKey = localStorage.getItem('geminiApiKey');
@@ -140,8 +143,22 @@ const Home: NextPage = () => {
                             <div className="space-y-6">
                                 {questions.map((q, index) => (
                                     <div key={index} className="bg-white p-6 rounded-lg shadow-md transition-all duration-300">
-                                        <p className="font-semibold mb-4 text-lg text-gray-900">{index + 1}. {q.question}</p>
-                                        <div className="space-y-2">
+                                        <div className="flex items-start justify-between gap-4 mb-2">
+                                            <p className="font-semibold text-lg text-gray-900 pt-1">{index + 1}. {q.question}</p>
+                                            <button
+                                                onClick={() => setVisibleRomajiIndex(visibleRomajiIndex === index ? null : index)}
+                                                className="text-xs bg-gray-200 text-gray-700 font-bold py-1 px-3 rounded-full hover:bg-gray-300 transition-colors flex-shrink-0"
+                                                title="Show/Hide Romaji"
+                                            >
+                                                Rōmaji
+                                            </button>
+                                        </div>
+
+                                        {visibleRomajiIndex === index && (
+                                            <div className="mb-4 p-2 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-sm transition-all duration-300 ease-in-out">
+                                                {q.question_romaji}
+                                            </div>
+                                        )}                                        <div className="space-y-2">
                                             {q.options.map((option, i) => {
                                                 const isCorrect = option === q.answer;
                                                 const isSelected = userAnswers[index] === option;
@@ -171,6 +188,14 @@ const Home: NextPage = () => {
                                                 );
                                             })}
                                         </div>
+                                        <details className="mt-4">
+                                            <summary className="cursor-pointer text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors">
+                                                Hint
+                                            </summary>
+                                            <div className="mt-2 p-3 bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 rounded-r-lg">
+                                                <p>{q.hint}</p>
+                                            </div>
+                                        </details>
                                     </div>
                                 ))}
 
