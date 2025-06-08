@@ -18,72 +18,194 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     answerDisplayFormat,
     setAnswerDisplayFormat,
 }) => {
+    const customStyles = {
+        overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        content: {
+            position: 'relative' as const,
+            top: 'auto',
+            left: 'auto',
+            right: 'auto',
+            bottom: 'auto',
+            background: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '24px',
+            padding: '2rem',
+            maxWidth: '500px',
+            width: '90%',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+        }
+    };
+
     return (
         <Modal
             isOpen={isOpen}
             onRequestClose={onRequestClose}
             contentLabel="Settings Modal"
-            className="Modal"
-            overlayClassName="Overlay"
+            style={customStyles}
+            closeTimeoutMS={200}
         >
-            <h2 className="text-2xl font-bold mb-4 text-black">Settings</h2>
-            <div className="mb-4">
-                <span className="font-semibold text-gray-700">Question Language:</span>
-                <div className="mt-2">
-                    <label className="inline-flex items-center mr-4">
-                        <input
-                            type="radio"
-                            value="japanese"
-                            checked={questionLanguage === 'japanese'}
-                            onChange={() => setQuestionLanguage('japanese')}
-                            className="form-radio text-blue-600"
-                        />
-                        <span className="ml-2 text-gray-800">Japanese (Fill-in-the-blank)</span>
-                    </label>
-                    <label className="inline-flex items-center">
-                        <input
-                            type="radio"
-                            value="english"
-                            checked={questionLanguage === 'english'}
-                            onChange={() => setQuestionLanguage('english')}
-                            className="form-radio text-blue-600"
-                        />
-                        <span className="ml-2 text-gray-800">English</span>
-                    </label>
+            <div className="relative">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center space-x-3">
+                        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-3 rounded-2xl shadow-lg">
+                            <span className="text-2xl">⚙️</span>
+                        </div>
+                        <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                            Settings
+                        </h2>
+                    </div>
+                    <button
+                        onClick={onRequestClose}
+                        className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-full"
+                    >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-            </div>
-            <div className="mb-4">
-                <span className="font-semibold text-gray-700">Answer Display:</span>
-                <div className="mt-2">
-                    <label className="inline-flex items-center mr-4">
-                        <input
-                            type="radio"
-                            value="japanese"
-                            checked={answerDisplayFormat === 'japanese'}
-                            onChange={() => setAnswerDisplayFormat('japanese')}
-                            className="form-radio text-blue-600"
-                        />
-                        <span className="ml-2 text-gray-800">Japanese</span>
-                    </label>
-                    <label className="inline-flex items-center">
-                        <input
-                            type="radio"
-                            value="romaji"
-                            checked={answerDisplayFormat === 'romaji'}
-                            onChange={() => setAnswerDisplayFormat('romaji')}
-                            className="form-radio text-blue-600"
-                        />
-                        <span className="ml-2 text-gray-800">Rōmaji</span>
-                    </label>
+
+                {/* Question Language Section */}
+                <div className="mb-8">
+                    <div className="flex items-center space-x-2 mb-4">
+                        <span className="text-xl">🌐</span>
+                        <h3 className="text-lg font-bold text-gray-800">Question Language</h3>
+                    </div>
+                    <div className="space-y-3">
+                        <label className="flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-purple-200 hover:bg-purple-50 transition-all duration-200 cursor-pointer group">
+                            <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-all duration-200 ${questionLanguage === 'japanese'
+                                ? 'border-purple-500 bg-purple-500'
+                                : 'border-gray-300 group-hover:border-purple-400'
+                                }`}>
+                                {questionLanguage === 'japanese' && (
+                                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                                )}
+                            </div>
+                            <input
+                                type="radio"
+                                value="japanese"
+                                checked={questionLanguage === 'japanese'}
+                                onChange={() => setQuestionLanguage('japanese')}
+                                className="sr-only"
+                            />
+                            <div className="flex-1">
+                                <div className="flex items-center space-x-2">
+                                    <span className="font-semibold text-gray-800">日本語</span>
+                                    <span className="text-sm text-gray-500">(Fill-in-the-blank)</span>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-1">Questions in Japanese with blanks to fill</p>
+                            </div>
+                        </label>
+
+                        <label className="flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-blue-200 hover:bg-blue-50 transition-all duration-200 cursor-pointer group">
+                            <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-all duration-200 ${questionLanguage === 'english'
+                                ? 'border-blue-500 bg-blue-500'
+                                : 'border-gray-300 group-hover:border-blue-400'
+                                }`}>
+                                {questionLanguage === 'english' && (
+                                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                                )}
+                            </div>
+                            <input
+                                type="radio"
+                                value="english"
+                                checked={questionLanguage === 'english'}
+                                onChange={() => setQuestionLanguage('english')}
+                                className="sr-only"
+                            />
+                            <div className="flex-1">
+                                <div className="flex items-center space-x-2">
+                                    <span className="font-semibold text-gray-800">English</span>
+                                    <span className="text-sm text-gray-500">(Translation)</span>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-1">Questions in English to translate</p>
+                            </div>
+                        </label>
+                    </div>
                 </div>
-            </div>
-            <div className="flex justify-end">
-                <button
-                    onClick={onRequestClose}
-                    className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                    Close
-                </button>
+
+                {/* Answer Display Section */}
+                <div className="mb-8">
+                    <div className="flex items-center space-x-2 mb-4">
+                        <span className="text-xl">📝</span>
+                        <h3 className="text-lg font-bold text-gray-800">Answer Display</h3>
+                    </div>
+                    <div className="space-y-3">
+                        <label className="flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-green-200 hover:bg-green-50 transition-all duration-200 cursor-pointer group">
+                            <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-all duration-200 ${answerDisplayFormat === 'japanese'
+                                ? 'border-green-500 bg-green-500'
+                                : 'border-gray-300 group-hover:border-green-400'
+                                }`}>
+                                {answerDisplayFormat === 'japanese' && (
+                                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                                )}
+                            </div>
+                            <input
+                                type="radio"
+                                value="japanese"
+                                checked={answerDisplayFormat === 'japanese'}
+                                onChange={() => setAnswerDisplayFormat('japanese')}
+                                className="sr-only"
+                            />
+                            <div className="flex-1">
+                                <div className="flex items-center space-x-2">
+                                    <span className="font-semibold text-gray-800">日本語</span>
+                                    <span className="text-sm text-gray-500">(Japanese)</span>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-1">Show answers in Japanese characters</p>
+                            </div>
+                        </label>
+
+                        <label className="flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-pink-200 hover:bg-pink-50 transition-all duration-200 cursor-pointer group">
+                            <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-all duration-200 ${answerDisplayFormat === 'romaji'
+                                ? 'border-pink-500 bg-pink-500'
+                                : 'border-gray-300 group-hover:border-pink-400'
+                                }`}>
+                                {answerDisplayFormat === 'romaji' && (
+                                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                                )}
+                            </div>
+                            <input
+                                type="radio"
+                                value="romaji"
+                                checked={answerDisplayFormat === 'romaji'}
+                                onChange={() => setAnswerDisplayFormat('romaji')}
+                                className="sr-only"
+                            />
+                            <div className="flex-1">
+                                <div className="flex items-center space-x-2">
+                                    <span className="font-semibold text-gray-800">Rōmaji</span>
+                                    <span className="text-sm text-gray-500">(Romanized)</span>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-1">Show answers in Roman alphabet</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button
+                        onClick={onRequestClose}
+                        className="px-6 py-3 text-gray-600 font-semibold rounded-xl hover:bg-gray-100 transition-all duration-200 transform hover:scale-105"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onRequestClose}
+                        className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                    >
+                        ✨ Save Settings
+                    </button>
+                </div>
             </div>
         </Modal>
     );

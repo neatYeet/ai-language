@@ -1,174 +1,35 @@
-import { useState, useEffect } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import ApiKeyModal from '../components/ApiKeyModal';
 import SettingsModal from '../components/SettingsModal';
-
-interface Question {
-    question: string;
-    options: string[];
-    answer: string;
-    hint: string;
-    question_romaji: string;
-}
-
-interface UserAnswers {
-    [key: number]: string;
-}
+import useQuizLogic from '../hooks/useQuizLogic';
 
 const Home: NextPage = () => {
-    const [apiKey, setApiKey] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
-    const [level, setLevel] = useState<number>(1);
-    const [questions, setQuestions] = useState<Question[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
-    const [score, setScore] = useState<number | null>(null);
-    const [submitted, setSubmitted] = useState<boolean>(false);
-    const [visibleRomajiIndex, setVisibleRomajiIndex] = useState<number | null>(null);
-    const [totalScore, setTotalScore] = useState<number>(0);
-    const [questionLanguage, setQuestionLanguage] = useState<'english' | 'japanese'>('japanese');
-    const [answerDisplayFormat, setAnswerDisplayFormat] = useState<'japanese' | 'romaji'>('japanese');
-    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
-
-    useEffect(() => {
-        const storedApiKey = localStorage.getItem('geminiApiKey');
-        if (storedApiKey) {
-            setApiKey(storedApiKey);
-        } else {
-            setIsModalOpen(true); // Automatically open API key modal if not found
-        }
-
-        const storedTotalScore = localStorage.getItem('totalScore');
-        if (storedTotalScore) {
-            setTotalScore(parseInt(storedTotalScore, 10));
-        }
-    }, []);
-
-    const handleApiKeySubmit = (key: string) => {
-        localStorage.setItem('geminiApiKey', key);
-        setApiKey(key);
-    };
-
-    const resetQuiz = () => {
-        setQuestions([]);
-        setUserAnswers({});
-        setScore(null);
-        setSubmitted(false);
-    };
-
-    const fetchQuestions = async (selectedLevel: number) => {
-        if (!apiKey) {
-            alert("API Key is not set. Please provide your API key.");
-            return;
-        };
-        resetQuiz();
-        const requiredScore = (selectedLevel - 1) * 100;
-        if (totalScore < requiredScore) {
-            alert(`You need ${requiredScore} points to unlock Level ${selectedLevel}. Keep practicing on lower levels!`);
-            return;
-        }
-
-        resetQuiz();
-        setLoading(true);
-        setLevel(selectedLevel);
-
-        try {
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ apiKey, level: selectedLevel, language: questionLanguage }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to fetch questions');
-            }
-
-            const data: { questions: Question[] } = await response.json();
-            setQuestions(data.questions);
-        } catch (error) {
-            console.error(error);
-            alert((error as Error).message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleAnswerChange = (questionIndex: number, selectedOption: string) => {
-        setUserAnswers({
-            ...userAnswers,
-            [questionIndex]: selectedOption,
-        });
-    };
-
-    const handleSubmit = () => {
-        let correctAnswers = 0;
-        questions.forEach((q, index) => {
-            if (userAnswers[index] === q.answer) {
-                correctAnswers++;
-            }
-        });
-        const quizScore = correctAnswers * 10;
-        const newTotalScore = totalScore + quizScore;
-        setScore(correctAnswers);
-        setTotalScore(newTotalScore);
-        localStorage.setItem('totalScore', newTotalScore.toString());
-        setSubmitted(true);
-    };
-
-    // Simple Romaji conversion (This is a basic implementation and may not cover all cases)
-    const toRomaji = (text: string): string => {
-        const hiraganaMap: { [key: string]: string } = {
-            'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
-            'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
-            'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
-            'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
-            'な': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
-            'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
-            'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
-            'や': 'ya', 'ゆ': 'yu', 'よ': 'yo',
-            'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
-            'わ': 'wa', 'を': 'wo', 'ん': 'n',
-            'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
-            'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
-            'だ': 'da', 'ぢ': 'ji', 'づ': 'zu', 'で': 'de', 'ど': 'do',
-            'ば': 'ba', 'び': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
-            'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
-            'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
-            'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
-            'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
-            'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
-            'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
-            'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
-            'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo',
-            'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
-            'じゃ': 'ja', 'じゅ': 'ju', 'じょ': 'jo',
-            'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
-            'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
-        };
-
-        let romaji = '';
-        for (let i = 0; i < text.length; i++) {
-            let char = text[i];
-            let nextChar = text[i + 1];
-            let twoChars = char + nextChar;
-
-            if (hiraganaMap[twoChars]) {
-                romaji += hiraganaMap[twoChars];
-                i++;
-            } else if (hiraganaMap[char]) {
-                romaji += hiraganaMap[char];
-            } else {
-                romaji += char; // Keep non-hiragana characters as they are
-            }
-        }
-        return romaji;
-    };
-
+    const {
+        apiKey,
+        isApiKeyModalOpen,
+        setIsApiKeyModalOpen,
+        level,
+        questions,
+        loading,
+        userAnswers,
+        score,
+        submitted,
+        visibleRomajiIndex,
+        setVisibleRomajiIndex,
+        totalScore,
+        questionLanguage,
+        setQuestionLanguage,
+        answerDisplayFormat,
+        setAnswerDisplayFormat,
+        isSettingsModalOpen,
+        setIsSettingsModalOpen,
+        handleApiKeySubmit,
+        fetchQuestions,
+        handleAnswerChange,
+        handleSubmit,
+        toRomaji,
+    } = useQuizLogic();
 
     return (
         <>
@@ -178,21 +39,15 @@ const Home: NextPage = () => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <div className="min-h-screen bg-gray-100 p-4 sm:p-8 font-sans">
-                <ApiKeyModal
-                    isOpen={isModalOpen}
-                    onRequestClose={() => setIsModalOpen(false)}
-                    onApiKeySubmit={handleApiKeySubmit}
-                />
-
-                <header className="text-center mb-8">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">AI-Powered Japanese Learning</h1>
-                    <p className="text-gray-600 mt-2">Select a level to generate questions with Gemini</p>
-                </header>
+            <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative overflow-hidden">
+                {/* Background decorative elements */}
+                <div className="absolute top-20 left-10 w-32 h-32 bg-pink-200 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute top-40 right-20 w-24 h-24 bg-blue-200 rounded-full opacity-20 animate-bounce"></div>
+                <div className="absolute bottom-20 left-1/4 w-20 h-20 bg-yellow-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
 
                 <ApiKeyModal
-                    isOpen={isModalOpen}
-                    onRequestClose={() => setIsModalOpen(false)}
+                    isOpen={isApiKeyModalOpen}
+                    onRequestClose={() => setIsApiKeyModalOpen(false)}
                     onApiKeySubmit={handleApiKeySubmit}
                 />
 
@@ -205,136 +60,242 @@ const Home: NextPage = () => {
                     setAnswerDisplayFormat={setAnswerDisplayFormat}
                 />
 
-                {apiKey ? (
-                    <main className="max-w-4xl mx-auto">
-                        <div className="flex justify-between items-center mb-4">
-                            <div className="text-lg font-semibold text-gray-700">
-                                Total Score: {totalScore}
-                            </div>
-                            <button
-                                onClick={() => setIsSettingsModalOpen(true)}
-                                className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
-                            >
-                                Settings
-                            </button>
+                <div className="relative z-10 p-4 sm:p-8">
+                    <header className="text-center mb-12">
+                        <div className="inline-block mb-4">
+                            <h1 className="text-4xl sm:text-6xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                                日本語 AI
+                            </h1>
+                            <div className="h-1 w-full bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full"></div>
                         </div>
-                        <div className="flex justify-center flex-wrap mb-8 gap-2 sm:gap-4 bg-white p-4 rounded-xl shadow-md">
-                            {[1, 2, 3, 4, 5].map((lvl) => {
-                                const requiredScore = (lvl - 1) * 100;
-                                const isLevelLocked = totalScore < requiredScore;
-                                return (
-                                    <button
-                                        key={lvl}
-                                        onClick={() => fetchQuestions(lvl)}
-                                        disabled={loading || isLevelLocked}
-                                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${level === lvl && !submitted
-                                            ? 'bg-blue-600 text-white shadow-lg scale-105'
-                                            : 'bg-white text-blue-600 hover:bg-blue-100'
-                                            } ${loading ? 'opacity-50 cursor-not-allowed' : ''} ${isLevelLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    >
-                                        Level {lvl} {isLevelLocked && `(${requiredScore} pts)`}
-                                    </button>
-                                );
-                            })}
+                        <p className="text-lg text-gray-600 font-medium">Master Japanese with intelligent AI questions</p>
+                        <div className="mt-4 inline-flex items-center space-x-2 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                            <span className="text-sm font-semibold text-gray-700">Powered by Gemini AI</span>
                         </div>
+                    </header>
 
-                        {loading && <div className="text-center font-semibold text-gray-700">Loading questions...</div>}
-
-                        {!loading && questions.length > 0 && (
-                            <div className="space-y-6">
-                                {questions.map((q, index) => (
-                                    <div key={index} className="bg-white p-6 rounded-lg shadow-md transition-all duration-300">
-                                        <div className="flex items-start justify-between gap-4 mb-2">
-                                            <p className="font-semibold text-lg text-gray-900 pt-1">{index + 1}. {q.question}</p>
-                                            <button
-                                                onClick={() => setVisibleRomajiIndex(visibleRomajiIndex === index ? null : index)}
-                                                className="text-xs bg-gray-200 text-gray-700 font-bold py-1 px-3 rounded-full hover:bg-gray-300 transition-colors flex-shrink-0"
-                                                title="Show/Hide Romaji"
-                                            >
-                                                Rōmaji
-                                            </button>
-                                        </div>
-
-                                        {visibleRomajiIndex === index && (
-                                            <div className="mb-4 p-2 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-sm transition-all duration-300 ease-in-out">
-                                                {q.question_romaji}
-                                            </div>
-                                        )}                                        <div className="space-y-2">
-                                            {q.options.map((option, i) => {
-                                                const isCorrect = option === q.answer;
-                                                const isSelected = userAnswers[index] === option;
-
-                                                let buttonClass = 'border-gray-300 hover:bg-gray-100 text-gray-900';
-                                                if (submitted) {
-                                                    if (isCorrect) {
-                                                        buttonClass = 'bg-green-200 border-green-400 text-green-900 font-bold';
-                                                    } else if (isSelected && !isCorrect) {
-                                                        buttonClass = 'bg-red-200 border-red-400 text-red-900';
-                                                    } else {
-                                                        buttonClass = 'border-gray-300 opacity-70';
-                                                    }
-                                                } else if (isSelected) {
-                                                    buttonClass = 'bg-blue-100 border-blue-400';
-                                                }
-
-                                                const displayedOption = answerDisplayFormat === 'romaji' ? toRomaji(option) : option;
-                                                return (
-                                                    <button
-                                                        key={i}
-                                                        onClick={() => handleAnswerChange(index, option)}
-                                                        disabled={submitted}
-                                                        className={`w-full text-left p-3 border rounded-lg transition-colors duration-200 ${buttonClass} ${!submitted ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-                                                    >
-                                                        {displayedOption}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                        <details className="mt-4">
-                                            <summary className="cursor-pointer text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors">
-                                                Hint
-                                            </summary>
-                                            <div className="mt-2 p-3 bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 rounded-r-lg">
-                                                <p>{q.hint}</p>
-                                            </div>
-                                        </details>
+                    {apiKey ? (
+                        <main className="max-w-4xl mx-auto">
+                            {/* Score and Settings Bar */}
+                            <div className="flex justify-between items-center mb-8 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20">
+                                <div className="flex items-center space-x-4">
+                                    <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-3 rounded-xl">
+                                        <span className="text-2xl">🏆</span>
                                     </div>
-                                ))}
-
-                                {!submitted && (
-                                    <div className="text-center mt-8">
-                                        <button
-                                            onClick={handleSubmit}
-                                            className="bg-green-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-600 transition-transform transform hover:scale-105"
-                                        >
-                                            Check Answers
-                                        </button>
+                                    <div>
+                                        <p className="text-sm text-gray-500 font-medium">Total Score</p>
+                                        <p className="text-3xl font-bold text-gray-800">{totalScore}</p>
                                     </div>
-                                )}
-                            </div>
-                        )}
-
-                        {submitted && score !== null && (
-                            <div className="text-center mt-8 p-6 bg-white rounded-lg shadow-xl">
-                                <h2 className="text-3xl font-bold text-blue-600 mb-2">
-                                    Your Score: {score} / {questions.length}
-                                </h2>
+                                </div>
                                 <button
-                                    onClick={() => fetchQuestions(level)}
-                                    className="mt-4 bg-blue-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors"
+                                    onClick={() => setIsSettingsModalOpen(true)}
+                                    className="bg-gray-800/90 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-xl hover:bg-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
                                 >
-                                    Retry Level {level}
+                                    ⚙️ Settings
                                 </button>
                             </div>
-                        )}
 
-                    </main>
-                ) : (
-                    <div className="text-center text-gray-600 mt-16">
-                        <p>Please enter your Gemini API key to begin.</p>
-                    </div>
-                )}
+                            {/* Level Selection */}
+                            <div className="mb-12">
+                                <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">Choose Your Challenge</h3>
+                                <div className="flex justify-center flex-wrap gap-4">
+                                    {[1, 2, 3, 4, 5].map((lvl) => {
+                                        const requiredScore = (lvl - 1) * 100;
+                                        const isLevelLocked = totalScore < requiredScore;
+                                        const isActive = level === lvl && !submitted;
+
+                                        return (
+                                            <button
+                                                key={lvl}
+                                                onClick={() => fetchQuestions(lvl)}
+                                                disabled={loading || isLevelLocked}
+                                                className={`relative group p-6 rounded-2xl font-bold transition-all duration-300 transform ${isActive
+                                                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-2xl scale-110 -translate-y-2'
+                                                        : isLevelLocked
+                                                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:shadow-xl hover:scale-105 hover:-translate-y-1'
+                                                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''} shadow-lg border border-white/20`}
+                                            >
+                                                <div className="text-2xl mb-2">
+                                                    {isLevelLocked ? '🔒' : isActive ? '🌟' : '📚'}
+                                                </div>
+                                                <div className="text-lg">Level {lvl}</div>
+                                                {isLevelLocked && (
+                                                    <div className="text-xs mt-1 opacity-70">{requiredScore} pts needed</div>
+                                                )}
+                                                {isActive && (
+                                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Loading State */}
+                            {loading && (
+                                <div className="flex flex-col items-center justify-center py-16">
+                                    <div className="relative">
+                                        <div className="w-16 h-16 border-4 border-indigo-200 rounded-full animate-spin border-t-indigo-600"></div>
+                                        <div className="absolute inset-0 w-16 h-16 border-4 border-transparent rounded-full animate-ping border-t-purple-400"></div>
+                                    </div>
+                                    <p className="mt-4 text-lg font-semibold text-gray-700 animate-pulse">
+                                        Generating questions with AI magic... ✨
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Questions */}
+                            {!loading && questions.length > 0 && (
+                                <div className="space-y-8">
+                                    {questions.map((q, index) => (
+                                        <div key={index} className="group relative">
+                                            <div className="bg-white/90 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white/30 transition-all duration-500 hover:shadow-2xl">
+                                                {/* Question Number Badge */}
+                                                <div className="absolute -top-4 -left-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-lg transform rotate-12 group-hover:rotate-0 transition-transform duration-300">
+                                                    {index + 1}
+                                                </div>
+
+                                                <div className="flex items-start justify-between gap-4 mb-6 pt-4">
+                                                    <p className="font-bold text-xl text-gray-900 leading-relaxed flex-1">
+                                                        {q.question}
+                                                    </p>
+                                                    <button
+                                                        onClick={() => setVisibleRomajiIndex(visibleRomajiIndex === index ? null : index)}
+                                                        className="bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 font-semibold py-2 px-4 rounded-full hover:from-pink-200 hover:to-purple-200 transition-all duration-300 flex-shrink-0 shadow-md hover:shadow-lg transform hover:scale-105"
+                                                    >
+                                                        🔤 Rōmaji
+                                                    </button>
+                                                </div>
+
+                                                {/* Romaji Display */}
+                                                {visibleRomajiIndex === index && (
+                                                    <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 text-blue-800 rounded-2xl font-medium animate-fadeIn">
+                                                        <span className="text-sm text-blue-600 font-semibold block mb-1">Romaji:</span>
+                                                        {q.question_romaji}
+                                                    </div>
+                                                )}
+
+                                                {/* Answer Options */}
+                                                <div className="space-y-3 mb-6">
+                                                    {q.options.map((option, i) => {
+                                                        const isCorrect = option === q.answer;
+                                                        const isSelected = userAnswers[index] === option;
+
+                                                        let buttonClass = 'bg-white border-2 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 text-gray-900 shadow-md hover:shadow-lg';
+                                                        let iconClass = '';
+
+                                                        if (submitted) {
+                                                            if (isCorrect) {
+                                                                buttonClass = 'bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-400 text-green-900 font-bold shadow-lg';
+                                                                iconClass = '✅';
+                                                            } else if (isSelected && !isCorrect) {
+                                                                buttonClass = 'bg-gradient-to-r from-red-100 to-pink-100 border-2 border-red-400 text-red-900 shadow-lg';
+                                                                iconClass = '❌';
+                                                            } else {
+                                                                buttonClass = 'bg-gray-50 border-2 border-gray-200 opacity-60';
+                                                            }
+                                                        } else if (isSelected) {
+                                                            buttonClass = 'bg-gradient-to-r from-indigo-100 to-purple-100 border-2 border-indigo-400 text-indigo-900 font-semibold shadow-lg';
+                                                            iconClass = '👆';
+                                                        }
+
+                                                        const displayedOption = answerDisplayFormat === 'romaji' ? toRomaji(option) : option;
+                                                        return (
+                                                            <button
+                                                                key={i}
+                                                                onClick={() => handleAnswerChange(index, option)}
+                                                                disabled={submitted}
+                                                                className={`w-full text-left p-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] ${buttonClass} ${!submitted ? 'cursor-pointer' : 'cursor-not-allowed'
+                                                                    } flex items-center justify-between`}
+                                                            >
+                                                                <span className="text-lg">{displayedOption}</span>
+                                                                {iconClass && <span className="text-xl">{iconClass}</span>}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+
+                                                {/* Hint Section */}
+                                                <details className="group/hint">
+                                                    <summary className="cursor-pointer text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors duration-300 flex items-center space-x-2 p-3 rounded-xl hover:bg-yellow-50">
+                                                        <span>💡</span>
+                                                        <span>Need a hint?</span>
+                                                        <span className="transform transition-transform duration-300 group-open/hint:rotate-180">⏷</span>
+                                                    </summary>
+                                                    <div className="mt-3 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 border-l-4 border-yellow-400 text-yellow-900 rounded-2xl shadow-inner">
+                                                        <p className="font-medium">{q.hint}</p>
+                                                    </div>
+                                                </details>
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    {/* Submit Button */}
+                                    {!submitted && (
+                                        <div className="text-center mt-12">
+                                            <button
+                                                onClick={handleSubmit}
+                                                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 px-12 rounded-2xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-2xl text-xl"
+                                            >
+                                                🎯 Check My Answers
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Score Display */}
+                            {submitted && score !== null && (
+                                <div className="text-center mt-12">
+                                    <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/30 max-w-md mx-auto">
+                                        <div className="text-6xl mb-4">
+                                            {score === questions.length ? '🎉' : score >= questions.length * 0.7 ? '🌟' : '💪'}
+                                        </div>
+                                        <h2 className="text-4xl font-black mb-2">
+                                            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                                                {score} / {questions.length}
+                                            </span>
+                                        </h2>
+                                        <p className="text-gray-600 mb-6 font-medium">
+                                            {score === questions.length
+                                                ? 'Perfect! You\'re amazing!'
+                                                : score >= questions.length * 0.7
+                                                    ? 'Great job! Keep it up!'
+                                                    : 'Good effort! Practice makes perfect!'}
+                                        </p>
+                                        <button
+                                            onClick={() => fetchQuestions(level)}
+                                            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-8 rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-xl"
+                                        >
+                                            🔄 Try Level {level} Again
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </main>
+                    ) : (
+                        <div className="text-center mt-16">
+                            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-white/30 max-w-md mx-auto">
+                                <div className="text-6xl mb-6">🔑</div>
+                                <h3 className="text-2xl font-bold text-gray-800 mb-4">Ready to Learn?</h3>
+                                <p className="text-gray-600 font-medium">Enter your Gemini API key to unlock your Japanese learning journey!</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
+
+            <style jsx>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(-10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fadeIn {
+                    animation: fadeIn 0.3s ease-out;
+                }
+            `}</style>
         </>
     );
 };
