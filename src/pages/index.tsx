@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { useEffect, useRef } from 'react';
 import ApiKeyModal from '../components/ApiKeyModal';
 import SettingsModal from '../components/SettingsModal';
 import useQuizLogic from '../hooks/useQuizLogic';
@@ -29,6 +30,31 @@ const Home: NextPage = () => {
         handleAnswerChange,
         handleSubmit,
     } = useQuizLogic();
+
+    // Refs for smooth scrolling
+    const loadingRef = useRef<HTMLDivElement>(null);
+    const questionsRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scroll effect when loading state changes
+    useEffect(() => {
+        if (loading) {
+            // Scroll down to loading indicator when AI starts generating
+            setTimeout(() => {
+                loadingRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 300); // Small delay to ensure the loading component is rendered
+        } else if (questions.length > 0) {
+            // Scroll up to first question when content is generated
+            setTimeout(() => {
+                questionsRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 500); // Delay to allow questions to render
+        }
+    }, [loading, questions.length]);
 
     return (
         <>
@@ -134,20 +160,38 @@ const Home: NextPage = () => {
 
                             {/* Loading State */}
                             {loading && (
-                                <div className="flex flex-col items-center justify-center py-16">
-                                    <div className="relative">
-                                        <div className="w-16 h-16 border-4 border-indigo-200 rounded-full animate-spin border-t-indigo-600"></div>
-                                        <div className="absolute inset-0 w-16 h-16 border-4 border-transparent rounded-full animate-ping border-t-purple-400"></div>
+                                <div
+                                    ref={loadingRef}
+                                    className="flex flex-col items-center justify-center py-16 min-h-[400px]"
+                                >
+                                    <div className="relative mb-8">
+                                        <div className="w-20 h-20 border-4 border-indigo-200 rounded-full animate-spin border-t-indigo-600"></div>
+                                        <div className="absolute inset-0 w-20 h-20 border-4 border-transparent rounded-full animate-ping border-t-purple-400"></div>
                                     </div>
-                                    <p className="mt-4 text-lg font-semibold text-gray-700 animate-pulse">
-                                        Generating questions with AI magic... ✨
-                                    </p>
+                                    <div className="text-center space-y-2">
+                                        <p className="text-xl font-bold text-gray-800 animate-pulse">
+                                            🤖 AI is crafting your questions...
+                                        </p>
+                                        <p className="text-lg text-gray-600 animate-pulse delay-500">
+                                            ✨ This might take a few moments
+                                        </p>
+                                        <div className="flex items-center justify-center space-x-1 mt-4">
+                                            <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"></div>
+                                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce delay-100"></div>
+                                            <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce delay-200"></div>
+                                        </div>
+                                    </div>
+                                    {/* Extra spacing to make scroll more noticeable */}
+                                    <div className="h-32"></div>
                                 </div>
                             )}
 
                             {/* Questions */}
                             {!loading && questions.length > 0 && (
-                                <div className="space-y-8">
+                                <div ref={questionsRef} className="space-y-8">
+                                    {/* Scroll target indicator (invisible) */}
+                                    <div className="h-4 -mb-4"></div>
+
                                     {questions.map((q, index) => (
                                         <div key={index} className="group relative">
                                             <div className="bg-white/90 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white/30 transition-all duration-500 hover:shadow-2xl">
@@ -285,16 +329,6 @@ const Home: NextPage = () => {
                     )}
                 </div>
             </div>
-
-            <style jsx>{`
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(-10px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .animate-fadeIn {
-                    animation: fadeIn 0.3s ease-out;
-                }
-            `}</style>
         </>
     );
 };
