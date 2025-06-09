@@ -35,7 +35,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onRequestClose, onApi
                     type="password"
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg mb-4"
+                    className="w-full px-3 py-2 border rounded-lg mb-4 text-gray-600"
                     placeholder="Your API Key"
                     required
                 />

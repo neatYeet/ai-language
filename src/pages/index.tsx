@@ -31,22 +31,18 @@ const Home: NextPage = () => {
         handleSubmit,
     } = useQuizLogic();
 
-    // Refs for smooth scrolling
     const loadingRef = useRef<HTMLDivElement>(null);
     const questionsRef = useRef<HTMLDivElement>(null);
 
-    // Auto-scroll effect when loading state changes
     useEffect(() => {
         if (loading) {
-            // Scroll down to loading indicator when AI starts generating
             setTimeout(() => {
                 loadingRef.current?.scrollIntoView({
                     behavior: 'smooth',
                     block: 'center'
                 });
-            }, 300); // Small delay to ensure the loading component is rendered
+            }, 300);
         } else if (questions.length > 0) {
-            // Scroll up to first question when content is generated
             setTimeout(() => {
                 questionsRef.current?.scrollIntoView({
                     behavior: 'smooth',
@@ -82,12 +78,6 @@ const Home: NextPage = () => {
                 <div className="absolute top-40 right-20 w-24 h-24 bg-blue-200 rounded-full opacity-20 animate-bounce"></div>
                 <div className="absolute bottom-20 left-1/4 w-20 h-20 bg-yellow-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
 
-                <ApiKeyModal
-                    isOpen={isApiKeyModalOpen}
-                    onRequestClose={() => setIsApiKeyModalOpen(false)}
-                    onApiKeySubmit={handleApiKeySubmit}
-                />
-
                 <SettingsModal
                     isOpen={isSettingsModalOpen}
                     onRequestClose={() => setIsSettingsModalOpen(false)}
@@ -97,22 +87,22 @@ const Home: NextPage = () => {
                     setAnswerDisplayFormat={setAnswerDisplayFormat}
                 />
 
-                <div className="relative z-10 p-4 sm:p-8">
-                    <header className="text-center mb-12">
-                        <div className="inline-block mb-4">
-                            <h1 className="text-4xl sm:text-6xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                                日本語 AI
-                            </h1>
-                            <div className="h-1 w-full bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full"></div>
-                        </div>
-                        <p className="text-lg text-gray-600 font-medium">Master Japanese with intelligent AI questions</p>
-                        <div className="mt-4 inline-flex items-center space-x-2 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
-                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                            <span className="text-sm font-semibold text-gray-700">Powered by Gemini AI</span>
-                        </div>
-                    </header>
+                {apiKey ? (
+                    <div className="relative z-10 p-4 sm:p-8">
+                        <header className="text-center mb-12">
+                            <div className="inline-block mb-4">
+                                <h1 className="text-4xl sm:text-6xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                                    日本語 AI
+                                </h1>
+                                <div className="h-1 w-full bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full"></div>
+                            </div>
+                            <p className="text-lg text-gray-600 font-medium">Master Japanese with intelligent AI questions</p>
+                            <div className="mt-4 inline-flex items-center space-x-2 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+                                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                <span className="text-sm font-semibold text-gray-700">Powered by Gemini AI</span>
+                            </div>
+                        </header>
 
-                    {apiKey ? (
                         <main className="max-w-4xl mx-auto">
                             {/* Score and Settings Bar */}
                             <div className="flex justify-between items-center mb-8 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20">
@@ -330,16 +320,14 @@ const Home: NextPage = () => {
                                 </div>
                             )}
                         </main>
-                    ) : (
-                        <div className="text-center mt-16">
-                            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-white/30 max-w-md mx-auto">
-                                <div className="text-6xl mb-6">🔑</div>
-                                <h3 className="text-2xl font-bold text-gray-800 mb-4">Ready to Learn?</h3>
-                                <p className="text-gray-600 font-medium">Enter your Gemini API key to unlock your Japanese learning journey!</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <ApiKeyModal
+                        isOpen={isApiKeyModalOpen}
+                        onRequestClose={() => setIsApiKeyModalOpen(false)}
+                        onApiKeySubmit={handleApiKeySubmit}
+                    />
+                )}
             </div>
         </>
     );
