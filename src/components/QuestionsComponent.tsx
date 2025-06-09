@@ -49,12 +49,14 @@ const QuestionsComponent: React.FC<QuestionsComponentProps> = ({
                             <p className="font-bold text-xl text-gray-900 leading-relaxed flex-1">
                                 {q.question}
                             </p>
-                            <button
-                                onClick={() => setVisibleRomajiIndex(visibleRomajiIndex === index ? null : index)}
-                                className="bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 font-semibold py-2 px-4 rounded-full hover:from-pink-200 hover:to-purple-200 transition-all duration-300 flex-shrink-0 shadow-md hover:shadow-lg transform hover:scale-105"
-                            >
-                                🔤 Rōmaji
-                            </button>
+                            {questionLanguage === 'japanese' &&
+                                <button
+                                    onClick={() => setVisibleRomajiIndex(visibleRomajiIndex === index ? null : index)}
+                                    className="bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 font-semibold py-2 px-4 rounded-full hover:from-pink-200 hover:to-purple-200 transition-all duration-300 flex-shrink-0 shadow-md hover:shadow-lg transform hover:scale-105"
+                                >
+                                    🔤 Rōmaji
+                                </button>
+                            }
                         </div>
 
                         {/* Romaji Display */}
