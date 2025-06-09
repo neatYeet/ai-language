@@ -30,7 +30,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onRequestClose, onApi
         >
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Enter Your Gemini API Key</h2>
             <p className="mb-4 text-gray-700">To use this app, please enter your Google AI Studio API key.</p>
-            <p className="mb-4 text-gray-700 text-sm">Your API key will not be sent to the server and will be stored securely in your browser's local storage.</p>
+            <p className="mb-4 text-gray-700 text-sm">Your API key will not be sent to the server and will be stored securely in your browser local storage.</p>
             <form onSubmit={handleSubmit}>
                 <input
                     type="password"
