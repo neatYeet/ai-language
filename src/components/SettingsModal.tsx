@@ -6,8 +6,8 @@ interface SettingsModalProps {
     onRequestClose: () => void;
     questionLanguage: 'english' | 'japanese';
     setQuestionLanguage: (language: 'english' | 'japanese') => void;
-    answerDisplayFormat: 'japanese' | 'romaji';
-    setAnswerDisplayFormat: (format: 'japanese' | 'romaji') => void;
+    answerDisplayFormat: 'japanese' | 'romaji' | 'both';
+    setAnswerDisplayFormat: (format: 'japanese' | 'romaji' | 'both') => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -193,6 +193,31 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                         <span className="text-sm text-gray-500">(Romanized)</span>
                                     </div>
                                     <p className="text-sm text-gray-600 mt-1">Show answers in Roman alphabet</p>
+                                </div>
+                            </label>
+
+                            <label className="flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-yellow-200 hover:bg-yellow-50 transition-all duration-200 cursor-pointer group">
+                                <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${answerDisplayFormat === 'both'
+                                    ? 'border-yellow-500 bg-yellow-500'
+                                    : 'border-gray-300 group-hover:border-yellow-400'
+                                    }`}>
+                                    {answerDisplayFormat === 'both' && (
+                                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                                    )}
+                                </div>
+                                <input
+                                    type="radio"
+                                    value="both"
+                                    checked={answerDisplayFormat === 'both'}
+                                    onChange={() => setAnswerDisplayFormat('both')}
+                                    className="sr-only"
+                                />
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center space-x-2 flex-wrap">
+                                        <span className="font-semibold text-gray-800">日本語 & Rōmaji</span>
+                                        <span className="text-sm text-gray-500">(Both)</span>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mt-1">Show answers in both Japanese and Roman alphabet</p>
                                 </div>
                             </label>
                         </div>

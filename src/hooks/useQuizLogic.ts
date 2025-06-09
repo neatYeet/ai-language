@@ -29,8 +29,8 @@ interface UseQuizLogic {
     totalScore: number;
     questionLanguage: 'english' | 'japanese';
     setQuestionLanguage: (language: 'english' | 'japanese') => void;
-    answerDisplayFormat: 'japanese' | 'romaji';
-    setAnswerDisplayFormat: (format: 'japanese' | 'romaji') => void;
+    answerDisplayFormat: 'japanese' | 'romaji' | 'both';
+    setAnswerDisplayFormat: (format: 'japanese' | 'romaji' | 'both') => void;
     isSettingsModalOpen: boolean;
     setIsSettingsModalOpen: (isOpen: boolean) => void;
     handleApiKeySubmit: (key: string) => void;
@@ -52,7 +52,7 @@ const useQuizLogic = (): UseQuizLogic => {
     const [visibleRomajiIndex, setVisibleRomajiIndex] = useState<number | null>(null);
     const [totalScore, setTotalScore] = useState<number>(0);
     const [questionLanguage, setQuestionLanguage] = useState<'english' | 'japanese'>('japanese');
-    const [answerDisplayFormat, setAnswerDisplayFormat] = useState<'japanese' | 'romaji'>('japanese');
+    const [answerDisplayFormat, setAnswerDisplayFormat] = useState<'japanese' | 'romaji' | 'both'>('japanese');
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
 
     useEffect(() => {

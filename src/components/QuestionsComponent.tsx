@@ -91,7 +91,12 @@ const QuestionsComponent: React.FC<QuestionsComponentProps> = ({
                                     iconClass = '👆';
                                 }
 
-                                const displayedOption = answerDisplayFormat === 'romaji' && questionLanguage === 'english' && q.options_romaji ? q.options_romaji[i] : option;
+                                let displayedOption = option;
+                                if (answerDisplayFormat == 'romaji' && q.options_romaji) {
+                                    displayedOption = q.options_romaji[i];
+                                } else if (answerDisplayFormat == 'both' && (questionLanguage === 'japanese' || questionLanguage === 'english') && q.options_romaji) {
+                                    displayedOption = `${option} (${q.options_romaji[i]})`;
+                                }
                                 return (
                                     <button
                                         key={i}
