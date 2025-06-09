@@ -60,16 +60,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="flex-shrink-0 p-6 pb-4 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
-                            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-3 rounded-2xl shadow-lg">
+                            <div className="bg-red-100 p-3 rounded-lg">
                                 <span className="text-2xl">⚙️</span>
                             </div>
-                            <h2 className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
                                 Settings
                             </h2>
                         </div>
                         <button
                             onClick={onRequestClose}
-                            className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-full"
+                            className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-lg"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -87,10 +87,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                             <h3 className="text-lg font-bold text-gray-800">Question Language</h3>
                         </div>
                         <div className="space-y-3">
-                            <label className="flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-purple-200 hover:bg-purple-50 transition-all duration-200 cursor-pointer group">
+                            <label className="flex items-center p-4 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all duration-200 cursor-pointer group">
                                 <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${questionLanguage === 'japanese'
-                                    ? 'border-purple-500 bg-purple-500'
-                                    : 'border-gray-300 group-hover:border-purple-400'
+                                    ? 'border-red-500 bg-red-500'
+                                    : 'border-gray-300 group-hover:border-red-400'
                                     }`}>
                                     {questionLanguage === 'japanese' && (
                                         <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -112,10 +112,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                 </div>
                             </label>
 
-                            <label className="flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-blue-200 hover:bg-blue-50 transition-all duration-200 cursor-pointer group">
+                            <label className="flex items-center p-4 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all duration-200 cursor-pointer group">
                                 <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${questionLanguage === 'english'
-                                    ? 'border-blue-500 bg-blue-500'
-                                    : 'border-gray-300 group-hover:border-blue-400'
+                                    ? 'border-red-500 bg-red-500'
+                                    : 'border-gray-300 group-hover:border-red-400'
                                     }`}>
                                     {questionLanguage === 'english' && (
                                         <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -146,10 +146,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                             <h3 className="text-lg font-bold text-gray-800">Answer Display</h3>
                         </div>
                         <div className="space-y-3">
-                            <label className="flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-green-200 hover:bg-green-50 transition-all duration-200 cursor-pointer group">
+                            <label className="flex items-center p-4 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all duration-200 cursor-pointer group">
                                 <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${answerDisplayFormat === 'japanese'
-                                    ? 'border-green-500 bg-green-500'
-                                    : 'border-gray-300 group-hover:border-green-400'
+                                    ? 'border-red-500 bg-red-500'
+                                    : 'border-gray-300 group-hover:border-red-400'
                                     }`}>
                                     {answerDisplayFormat === 'japanese' && (
                                         <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -171,10 +171,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                 </div>
                             </label>
 
-                            <label className="flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-pink-200 hover:bg-pink-50 transition-all duration-200 cursor-pointer group">
+                            <label className="flex items-center p-4 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all duration-200 cursor-pointer group">
                                 <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${answerDisplayFormat === 'romaji'
-                                    ? 'border-pink-500 bg-pink-500'
-                                    : 'border-gray-300 group-hover:border-pink-400'
+                                    ? 'border-red-500 bg-red-500'
+                                    : 'border-gray-300 group-hover:border-red-400'
                                     }`}>
                                     {answerDisplayFormat === 'romaji' && (
                                         <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -196,10 +196,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                 </div>
                             </label>
 
-                            <label className="flex items-center p-4 rounded-2xl border-2 border-transparent hover:border-yellow-200 hover:bg-yellow-50 transition-all duration-200 cursor-pointer group">
+                            <label className="flex items-center p-4 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all duration-200 cursor-pointer group">
                                 <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${answerDisplayFormat === 'both'
-                                    ? 'border-yellow-500 bg-yellow-500'
-                                    : 'border-gray-300 group-hover:border-yellow-400'
+                                    ? 'border-red-500 bg-red-500'
+                                    : 'border-gray-300 group-hover:border-red-400'
                                     }`}>
                                     {answerDisplayFormat === 'both' && (
                                         <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -229,15 +229,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     <div className="flex justify-end space-x-3">
                         <button
                             onClick={onRequestClose}
-                            className="px-4 sm:px-6 py-3 text-gray-600 font-semibold rounded-xl hover:bg-gray-100 transition-all duration-200 transform hover:scale-105"
+                            className="px-4 sm:px-6 py-3 text-gray-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={onRequestClose}
-                            className="px-6 sm:px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                            className="px-6 sm:px-8 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors duration-200 shadow-sm"
                         >
-                            <span className="hidden sm:inline">✨ </span>Save
+                            Save
                         </button>
                     </div>
                 </div>

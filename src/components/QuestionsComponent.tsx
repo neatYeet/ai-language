@@ -39,20 +39,20 @@ const QuestionsComponent: React.FC<QuestionsComponentProps> = ({
 
             {questions.map((q, index) => (
                 <div key={index} className="group relative">
-                    <div className="bg-white/90 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white/30 transition-all duration-500 hover:shadow-2xl">
+                    <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200 transition-all duration-200 hover:shadow-lg">
                         {/* Question Number Badge */}
-                        <div className="absolute -top-4 -left-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-lg transform rotate-12 group-hover:rotate-0 transition-transform duration-300">
+                        <div className="absolute -top-3 -left-3 bg-red-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-sm shadow-sm">
                             {index + 1}
                         </div>
 
-                        <div className="flex items-start justify-between gap-4 mb-6 pt-4">
-                            <p className="font-bold text-xl text-gray-900 leading-relaxed flex-1">
+                        <div className="flex items-start justify-between gap-4 mb-6 pt-2">
+                            <p className="font-semibold text-xl text-gray-900 leading-relaxed flex-1">
                                 {q.question}
                             </p>
                             {questionLanguage === 'japanese' &&
                                 <button
                                     onClick={() => setVisibleRomajiIndex(visibleRomajiIndex === index ? null : index)}
-                                    className="bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 font-semibold py-2 px-4 rounded-full hover:from-pink-200 hover:to-purple-200 transition-all duration-300 flex-shrink-0 shadow-md hover:shadow-lg transform hover:scale-105"
+                                    className="bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex-shrink-0 border border-gray-200"
                                 >
                                     🔤 Rōmaji
                                 </button>
@@ -61,8 +61,8 @@ const QuestionsComponent: React.FC<QuestionsComponentProps> = ({
 
                         {/* Romaji Display */}
                         {visibleRomajiIndex === index && (
-                            <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 text-blue-800 rounded-2xl font-medium animate-fadeIn">
-                                <span className="text-sm text-blue-600 font-semibold block mb-1">Romaji:</span>
+                            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 text-red-800 rounded-lg font-medium">
+                                <span className="text-sm text-red-600 font-semibold block mb-1">Romaji:</span>
                                 {q.question_romaji}
                             </div>
                         )}
@@ -73,28 +73,31 @@ const QuestionsComponent: React.FC<QuestionsComponentProps> = ({
                                 const isCorrect = option === q.answer;
                                 const isSelected = userAnswers[index] === option;
 
-                                let buttonClass = 'bg-white border-2 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 text-gray-900 shadow-md hover:shadow-lg';
+                                let buttonClass = 'bg-white border border-gray-300 hover:border-red-400 hover:bg-red-50 text-gray-900 shadow-sm hover:shadow-md';
                                 let iconClass = '';
 
                                 if (submitted) {
                                     if (isCorrect) {
-                                        buttonClass = 'bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-400 text-green-900 font-bold shadow-lg';
+                                        buttonClass = 'bg-green-50 border border-green-400 text-green-900 font-semibold shadow-sm';
                                         iconClass = '✅';
                                     } else if (isSelected && !isCorrect) {
-                                        buttonClass = 'bg-gradient-to-r from-red-100 to-pink-100 border-2 border-red-400 text-red-900 shadow-lg';
+                                        buttonClass = 'bg-red-50 border border-red-400 text-red-900 shadow-sm';
                                         iconClass = '❌';
                                     } else {
-                                        buttonClass = 'bg-gray-50 border-2 border-gray-200 opacity-60';
+                                        buttonClass = 'bg-gray-50 border border-gray-200 opacity-60';
                                     }
                                 } else if (isSelected) {
-                                    buttonClass = 'bg-gradient-to-r from-indigo-100 to-purple-100 border-2 border-indigo-400 text-indigo-900 font-semibold shadow-lg';
+                                    buttonClass = 'bg-red-50 border border-red-400 text-red-900 font-semibold shadow-sm';
                                     iconClass = '👆';
                                 }
 
                                 let displayedOption = option;
+                                if (answerDisplayFormat == 'japanese') {
+                                    displayedOption = q.options[i];
+                                }
                                 if (answerDisplayFormat == 'romaji' && q.options_romaji) {
                                     displayedOption = q.options_romaji[i];
-                                } else if (answerDisplayFormat == 'both' && (questionLanguage === 'japanese' || questionLanguage === 'english') && q.options_romaji) {
+                                } else if (answerDisplayFormat == 'both' && q.options_romaji) {
                                     displayedOption = `${option} (${q.options_romaji[i]})`;
                                 }
                                 return (
@@ -102,7 +105,7 @@ const QuestionsComponent: React.FC<QuestionsComponentProps> = ({
                                         key={i}
                                         onClick={() => handleAnswerChange(index, option)}
                                         disabled={submitted}
-                                        className={`w-full text-left p-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] ${buttonClass} ${!submitted ? 'cursor-pointer' : 'cursor-not-allowed'
+                                        className={`w-full text-left p-4 rounded-lg transition-colors duration-200 ${buttonClass} ${!submitted ? 'cursor-pointer' : 'cursor-not-allowed'
                                             } flex items-center justify-between`}
                                     >
                                         <span className="text-lg">{displayedOption}</span>
@@ -114,12 +117,12 @@ const QuestionsComponent: React.FC<QuestionsComponentProps> = ({
 
                         {/* Hint Section */}
                         <details className="group/hint">
-                            <summary className="cursor-pointer text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors duration-300 flex items-center space-x-2 p-3 rounded-xl hover:bg-yellow-50">
+                            <summary className="cursor-pointer text-sm font-semibold text-gray-600 hover:text-red-600 transition-colors duration-200 flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-50 border border-gray-200">
                                 <span>💡</span>
                                 <span>Need a hint?</span>
-                                <span className="transform transition-transform duration-300 group-open/hint:rotate-180">🔻</span>
+                                <span className="transform transition-transform duration-200 group-open/hint:rotate-180">🔻</span>
                             </summary>
-                            <div className="mt-3 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 border-l-4 border-yellow-400 text-yellow-900 rounded-2xl shadow-inner">
+                            <div className="mt-3 p-4 bg-red-50 border-l-4 border-red-400 text-red-900 rounded-lg">
                                 <p className="font-medium">{q.hint}</p>
                             </div>
                         </details>
@@ -132,7 +135,7 @@ const QuestionsComponent: React.FC<QuestionsComponentProps> = ({
                 <div className="text-center mt-12">
                     <button
                         onClick={handleSubmit}
-                        className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 px-12 rounded-2xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-2xl text-xl"
+                        className="bg-red-600 text-white font-semibold py-4 px-12 rounded-lg hover:bg-red-700 transition-colors duration-200 shadow-md text-xl"
                     >
                         🎯 Check My Answers
                     </button>

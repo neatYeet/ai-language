@@ -7,9 +7,9 @@ interface ScoreSettingsBarProps {
 
 const ScoreSettingsBar: React.FC<ScoreSettingsBarProps> = ({ totalScore, setIsSettingsModalOpen }) => {
     return (
-        <div className="flex justify-between items-center mb-8 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20">
+        <div className="flex justify-between items-center mb-8 bg-white rounded-lg p-6 shadow-md border border-gray-200">
             <div className="flex items-center space-x-4">
-                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-3 rounded-xl">
+                <div className="bg-red-100 p-3 rounded-lg">
                     <span className="text-2xl">🏆</span>
                 </div>
                 <div>
@@ -19,7 +19,7 @@ const ScoreSettingsBar: React.FC<ScoreSettingsBarProps> = ({ totalScore, setIsSe
             </div>
             <button
                 onClick={() => setIsSettingsModalOpen(true)}
-                className="bg-gray-800/90 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-xl hover:bg-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                className="bg-red-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-red-700 transition-colors duration-200 shadow-sm"
             >
                 ⚙️ Settings
             </button>

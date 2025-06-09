@@ -62,8 +62,7 @@ const Home: NextPage = () => {
         <>
             <HeadComponent />
 
-            <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative overflow-hidden">
-
+            <div className="min-h-screen bg-gray-50 relative overflow-hidden">
                 <SettingsModal
                     isOpen={isSettingsModalOpen}
                     onRequestClose={() => setIsSettingsModalOpen(false)}
